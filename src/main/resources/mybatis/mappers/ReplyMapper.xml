@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="mappers.ReplyMapper">
+    <select id="selectAll" resultType="replyDTO" parameterType="int">
+        SELECT * FROM reply
+        WHERE board_id = #{boardId}
+        ORDER BY id DESC
+    </select>
+
+    <select id="selectOne" parameterType="int" resultType="replyDTO">
+        SELECT * FROM reply
+        WHERE id = #{id}
+    </select>
+
+    <insert id="insert" parameterType="replyDTO" useGeneratedKeys="true" keyProperty="id">
+        INSERT INTO reply(content, board_id, writer_id)
+        VALUES(#{content}, #{boardId}, #{writerId})
+    </insert>
+
+    <update id="update" parameterType="replyDTO">
+        UPDATE reply
+        SET content = #{content}, modify_date = NOW()
+        WHERE id = #{id}
+    </update>
+
+    <delete id="delete" parameterType="int">
+        DELETE FROM reply
+        WHERE id = #{id}
+    </delete>
+
+    <select id="count" resultType="int" parameterType="int">
+        SELECT COUNT(*)
+        FROM reply
+        WHERE board_id = #{boardId}
+    </select>
+</mapper>
