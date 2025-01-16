@@ -31,5 +31,9 @@ public class UserService {
     public void register(UserDTO userDTO) {
         sqlSession.insert(NAMESPACE + ".register", userDTO);
     }
+
+    public UserDTO selectByEmail(String email) {
+        return sqlSession.selectOne(NAMESPACE + ".selectByEmail", email);
+    }
 }
 

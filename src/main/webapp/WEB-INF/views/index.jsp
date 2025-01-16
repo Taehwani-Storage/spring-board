@@ -61,6 +61,12 @@
                     <a href="/user/register" class="btn btn-outline-dark btn-custom">회원가입</a>
                 </div>
             </div>
+            <div class="row mt-3 justify-content-center">
+                <div class="col-6">
+                    <a href="https://kauth.kakao.com/oauth/authorize?response_type=code&client_id=${REST_API_KEY}&redirect_uri=${REDIRECT_URI}
+">카카오 로그인하기</a>
+                </div>
+            </div>
         </form>
     </div>
 </div>

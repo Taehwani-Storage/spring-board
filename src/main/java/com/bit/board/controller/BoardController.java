@@ -26,9 +26,9 @@ public class BoardController {
     @GetMapping("showAll/{pageNo}")
     public String showAll(@PathVariable int pageNo, HttpSession session, Model model) {
         UserDTO logIn = (UserDTO) session.getAttribute("logIn");
-        if (logIn == null) {
-            return "redirect:/";
-        }
+//        if (logIn == null) {
+//            return "redirect:/";
+//        }
         int maxPage = boardService.countMax();
 
         int startPage;

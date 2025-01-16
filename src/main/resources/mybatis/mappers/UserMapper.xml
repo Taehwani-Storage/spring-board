@@ -21,4 +21,8 @@
         INSERT INTO user(username, password, nickname)
         VALUES(#{username}, #{password}, #{nickname})
     </insert>
+    <select id="selectByEmail" parameterType="String" resultType="userDTO">
+        SELECT * FROM user
+        WHERE email=#{email}
+    </select>
 </mapper>
