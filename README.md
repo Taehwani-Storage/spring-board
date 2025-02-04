@@ -1,130 +1,129 @@
-# 자바 학습 가이드
+# 📌 Spring 게시판 미니 프로젝트
 
-## 1. 자바 기본 문법
-자바의 기본 문법을 익히기 위한 개념을 정리합니다.
+## 📖 프로젝트 개요
+이 프로젝트는 **Spring Framework**를 활용하여 간단한 게시판을 구현하는 미니 프로젝트입니다. 
+프론트엔드와 백엔드를 함께 구성하며, MyBatis를 활용한 데이터베이스 연동을 포함합니다.
 
-### 1.1. 변수와 자료형
-```java
-int number = 10;
-String text = "Hello, Java!";
-double pi = 3.14;
+### 🚀 사용 기술
+- **프론트엔드**: JSP (WEB-INF/mapper/*.xml)
+- **백엔드**:
+  - Lombok
+  - Spring Web
+  - Spring Boot DevTools
+  - JDBC API
+  - MyBatis
+  - MySQL Driver
+
+---
+
+## 🏗️ 게시판 기본 기능 구현
+
+### 🛠️ 프로젝트 구조
+```
+📂 src/main/java/com/example/board
+ ┣ 📂 controller      // 컨트롤러 (요청 처리)
+ ┣ 📂 service         // 서비스 (비즈니스 로직)
+ ┣ 📂 repository      // DAO, MyBatis 매퍼
+ ┣ 📂 model          // 엔티티 클래스
+ ┗ 📂 config         // 설정 파일
 ```
 
-### 1.2. 제어문
-#### 1.2.1. 조건문
+### 📝 게시글 목록 보기
+#### 📌 Controller (게시글 리스트 반환)
 ```java
-if (number > 5) {
-    System.out.println("Number is greater than 5");
-} else {
-    System.out.println("Number is 5 or less");
-}
-```
+@RestController
+@RequestMapping("/posts")
+public class PostController {
+    @Autowired
+    private PostService postService;
 
-#### 1.2.2. 반복문
-```java
-for (int i = 0; i < 5; i++) {
-    System.out.println("Iteration: " + i);
-}
-```
-
-## 2. 스레드, 제네릭, 컬렉션
-자바의 고급 기능을 학습합니다.
-
-### 2.1. 스레드
-```java
-class MyThread extends Thread {
-    public void run() {
-        System.out.println("Thread is running...");
-    }
-}
-MyThread thread = new MyThread();
-thread.start();
-```
-
-### 2.2. 제네릭
-```java
-class Box<T> {
-    private T value;
-    public void setValue(T value) { this.value = value; }
-    public T getValue() { return value; }
-}
-Box<String> box = new Box<>();
-box.setValue("Hello");
-System.out.println(box.getValue());
-```
-
-### 2.3. 컬렉션
-```java
-import java.util.ArrayList;
-ArrayList<String> list = new ArrayList<>();
-list.add("Java");
-list.add("Collections");
-for (String item : list) {
-    System.out.println(item);
-}
-```
-
-## 3. 게시판 미니 프로젝트
-### 3.1. 프로젝트 개요
-- 사용자 로그인 / 회원가입 기능
-- 게시글 CRUD (Create, Read, Update, Delete)
-- 댓글 및 좋아요 기능
-
-### 3.2. 주요 기능 구현 (Java)
-#### 3.2.1. 게시글 클래스
-```java
-class Post {
-    private int id;
-    private String title;
-    private String content;
-    private String author;
-    
-    public Post(int id, String title, String content, String author) {
-        this.id = id;
-        this.title = title;
-        this.content = content;
-        this.author = author;
-    }
-    public void display() {
-        System.out.println("Title: " + title);
-        System.out.println("Content: " + content);
-        System.out.println("Author: " + author);
+    @GetMapping
+    public List<Post> getAllPosts() {
+        return postService.getAllPosts();
     }
 }
 ```
-
-#### 3.2.2. 게시판 기능 구현
+#### 📌 Service (비즈니스 로직)
 ```java
-import java.util.ArrayList;
+@Service
+public class PostService {
+    @Autowired
+    private PostMapper postMapper;
 
-class Board {
-    private ArrayList<Post> posts = new ArrayList<>();
-    
-    public void addPost(Post post) {
-        posts.add(post);
-    }
-    
-    public void listPosts() {
-        for (Post post : posts) {
-            post.display();
-            System.out.println("----------------");
-        }
+    public List<Post> getAllPosts() {
+        return postMapper.getAllPosts();
     }
 }
 ```
+#### 📌 Mapper (MyBatis XML 파일)
+```xml
+<mapper namespace="com.example.board.mapper.PostMapper">
+    <select id="getAllPosts" resultType="Post">
+        SELECT * FROM posts ORDER BY created_at DESC;
+    </select>
+</mapper>
+```
 
-### 3.3. 실행 예제
+---
+
+### 📝 게시글 추가, 수정, 삭제, 댓글 기능
+
+#### 📌 게시글 추가 (Create)
 ```java
-public class Main {
-    public static void main(String[] args) {
-        Board board = new Board();
-        board.addPost(new Post(1, "Java Basics", "Learn Java from scratch.", "Alice"));
-        board.addPost(new Post(2, "Advanced Java", "Exploring threads and collections.", "Bob"));
-        
-        board.listPosts();
-    }
+@PostMapping
+public void createPost(@RequestBody Post post) {
+    postService.createPost(post);
+}
+```
+#### 📌 게시글 수정 (Update)
+```java
+@PutMapping("/{id}")
+public void updatePost(@PathVariable int id, @RequestBody Post post) {
+    postService.updatePost(id, post);
+}
+```
+#### 📌 게시글 삭제 (Delete)
+```java
+@DeleteMapping("/{id}")
+public void deletePost(@PathVariable int id) {
+    postService.deletePost(id);
+}
+```
+#### 📌 댓글 추가 기능
+```java
+@PostMapping("/{postId}/comments")
+public void addComment(@PathVariable int postId, @RequestBody Comment comment) {
+    commentService.addComment(postId, comment);
 }
 ```
 
-## 4. 결론
-이 문서를 기반으로 자바의 기본 문법과 고급 개념을 학습하고, 실전 프로젝트를 통해 응용 능력을 키울 수 있습니다. 추가적으로 데이터베이스 연동과 웹 기반 프로젝트로 확장할 수도 있습니다.
+---
+
+## 🌐 RESTful API 활용
+게시판의 주요 기능을 RESTful API로 설계하고, JSON 데이터를 활용하여 프론트엔드와 통신합니다.
+
+### 📌 API 엔드포인트
+| HTTP Method | Endpoint           | 설명          |
+|-------------|-------------------|--------------|
+| GET         | `/posts`          | 게시글 목록 조회 |
+| GET         | `/posts/{id}`     | 특정 게시글 조회 |
+| POST        | `/posts`          | 게시글 추가 |
+| PUT         | `/posts/{id}`     | 게시글 수정 |
+| DELETE      | `/posts/{id}`     | 게시글 삭제 |
+| POST        | `/posts/{id}/comments` | 댓글 추가 |
+
+### 📌 JSON 데이터 예시
+#### 📌 게시글 추가 요청 JSON
+```json
+{
+    "title": "Spring Boot 게시판",
+    "content": "게시판을 만들면서 Spring Boot를 학습합니다.",
+    "author": "Alice"
+}
+```
+
+---
+
+## ✅ 결론
+이 프로젝트를 통해 Spring Boot와 MyBatis를 활용한 **게시판 구현**을 경험할 수 있습니다. 
+추후 **OAuth 로그인, 파일 업로드, 좋아요 기능** 등의 기능을 추가하여 더욱 확장할 수 있습니다! 🚀
